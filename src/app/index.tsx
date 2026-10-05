@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Colors } from '@/constants/colors';
 import { useThemeColors } from '@/hooks/useThemeColors';
@@ -14,7 +14,8 @@ type ButtonProps = {
 const rows: ButtonProps[][] = [
   [
     { label: 'C',  type: 'functional' },
-    { label: '⌫', width: 2, type: 'functional' },
+    { label: '⌫', type: 'functional' },
+    { label: 'log', type: 'functional' },
     { label: '÷', type: 'operation' },
   ],
   [
@@ -57,6 +58,22 @@ export default function Index() {
       calculate();
     }
 
+    else if (value === 'log') {
+      const tokens = getTokens(result);
+      const a = Number(tokens.at(-1));
+      if (isNaN(a)) return;
+
+      if (a <= 0) {
+        setInput('');
+        setResult('Ошибка: нужно положительное число');
+        return;
+      }
+
+      tokens[tokens.length - 1] = String(Math.log(a));
+      setInput('');
+      setResult(tokens.join(''));
+    }
+
     else if (value === '⌫') {
       setInput('');
       setResult(prev => prev.startsWith('Ошибка') ? '' : prev.slice(0, -1));
@@ -69,7 +86,7 @@ export default function Index() {
       return;
     }
 
-    else if (/^\d+(?:\.\d*)?(?:[+\-×÷](?:\d+(?:\.\d*)?)?)?$/.test(next)) {
+    else if (next === '-' || /^-?\d+(?:\.\d*)?(?:[+\-×÷]-?(?:\d+(?:\.\d*)?)?)?$/.test(next)) {
       setInput('');
       setResult(next);
     }
@@ -79,8 +96,8 @@ export default function Index() {
     if (input) return;
 
     try {
-      const [first, operator, second] = result.split(/([+\-×÷])/);
-      if (!operator || !second) return;
+      const [first, operator, second] = getTokens(result);
+      if (!operator || !second || second === '-') return;
 
       setInput(result);
 
@@ -118,8 +135,22 @@ export default function Index() {
   return (
     <View style={styles.calculator}>
       <View style={styles.display}>
-        <Text style={styles.expression}>{input}</Text>
-        <Text style={styles.result}>{result || '0'}</Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.displayScroll}
+          contentContainerStyle={styles.displayContent}
+        >
+          <Text numberOfLines={1} style={styles.expression}>{formatText(input)}</Text>
+        </ScrollView>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.displayScroll}
+          contentContainerStyle={styles.displayContent}
+        >
+          <Text numberOfLines={1} style={styles.result}>{formatText(result || '0')}</Text>
+        </ScrollView>
       </View>
 
       <View style={styles.buttonGrid}>
@@ -137,6 +168,33 @@ export default function Index() {
       </View>
     </View>
   )
+}
+
+function getTokens(value: string) {
+  const raw = value.split(/([+\-×÷])/).filter(Boolean);
+  const tokens: string[] = [];
+
+  for (let i = 0; i < raw.length; i++) {
+    const token = raw[i];
+
+    if (
+      token === '-' && (i === 0 || '+-×÷'.includes(raw[i - 1])) && raw[i + 1]) {
+      tokens.push('-' + raw[i + 1]);
+      i++;
+    } else {
+      tokens.push(token);
+    }
+  }
+
+  return tokens;
+}
+
+function formatText(value: string) {
+  const formattedText = getTokens(value)
+    .map(token => Number(token) < 0 ? `(${token})` : token)
+    .join(' ');
+
+  return formattedText;
 }
 
 function CalculatorButton({ label, width = 1, type = 'number', onPress }: ButtonProps) {
@@ -173,6 +231,17 @@ function getStyles(colors: typeof Colors.light) {
       alignItems: 'flex-end',
       paddingLeft: 30,
       paddingRight: 30
+    },
+
+    displayScroll: {
+      width: '100%',
+      flexGrow: 0,
+      flexShrink: 0,
+    },
+
+    displayContent: {
+      minWidth: '100%',
+      justifyContent: 'flex-end',
     },
 
     expression: {

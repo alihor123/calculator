@@ -32,7 +32,7 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
-    "start": "set \"EXPO_PACKAGER_PROXY_URL=http://192.168.0.219:8081\" && expo start",
+    "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
