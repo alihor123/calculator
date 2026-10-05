@@ -1,15 +1,10 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { CalculatorButton, type ButtonProps } from '@/components/CalculatorButton';
 import { Colors } from '@/constants/colors';
+import { formatText, getTokens } from '@/helpers/calculator';
 import { useThemeColors } from '@/hooks/useThemeColors';
-
-type ButtonProps = {
-  label: string;
-  width?: number;
-  type?: 'number' | 'functional' | 'operation';
-  onPress?: () => void;
-};
 
 const rows: ButtonProps[][] = [
   [
@@ -170,52 +165,6 @@ export default function Index() {
   )
 }
 
-function getTokens(value: string) {
-  const raw = value.split(/([+\-×÷])/).filter(Boolean);
-  const tokens: string[] = [];
-
-  for (let i = 0; i < raw.length; i++) {
-    const token = raw[i];
-
-    if (
-      token === '-' && (i === 0 || '+-×÷'.includes(raw[i - 1])) && raw[i + 1]) {
-      tokens.push('-' + raw[i + 1]);
-      i++;
-    } else {
-      tokens.push(token);
-    }
-  }
-
-  return tokens;
-}
-
-function formatText(value: string) {
-  const formattedText = getTokens(value)
-    .map(token => Number(token) < 0 ? `(${token})` : token)
-    .join('');
-
-  return formattedText;
-}
-
-function CalculatorButton({ label, width = 1, type = 'number', onPress }: ButtonProps) {
-  const colors = useThemeColors();
-  const styles = getStyles(colors);
-
-  return (
-    <Pressable onPress={onPress} style={({ pressed }) => [
-      styles.button,
-      styles[`${type}Button`],
-      pressed && styles[`${type}Pressed`],
-      width === 1 && styles.squareButton,
-      { flex: width },
-    ]}>
-      <Text style={[styles.buttonText, styles[`${type}Text`]]}>
-        {label}
-      </Text>
-    </Pressable>
-  );
-}
-
 function getStyles(colors: typeof Colors.light) {
   return StyleSheet.create({
     calculator: {
@@ -268,54 +217,5 @@ function getStyles(colors: typeof Colors.light) {
       gap: 10,
     },
 
-    button: {
-      borderRadius: 30,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-
-    buttonText: {
-      fontSize: 30,
-    },
-
-    squareButton: {
-      aspectRatio: 1,
-    },
-
-    numberButton: {
-      backgroundColor: colors.button,
-    },
-
-    numberPressed: {
-      backgroundColor: colors.buttonPressed,
-    },
-
-    numberText: {
-      color: colors.buttonText,
-    },
-
-    functionalButton: {
-      backgroundColor: colors.functionalButton,
-    },
-
-    functionalPressed: {
-      backgroundColor: colors.functionalPressed,
-    },
-
-    functionalText: {
-      color: colors.functionalText,
-    },
-
-    operationButton: {
-      backgroundColor: colors.operationBackground,
-    },
-
-    operationPressed: {
-      backgroundColor: colors.operationPressed,
-    },
-
-    operationText: {
-      color: colors.operationText,
-    },
   })
 }
