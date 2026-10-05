@@ -76,7 +76,7 @@ export default function Index() {
   }
 
   function calculate() {
-    if (input || result.startsWith('Ошибка')) return;
+    if (input) return;
 
     try {
       const [first, operator, second] = result.split(/([+\-×÷])/);
