@@ -13,9 +13,8 @@ type ButtonProps = {
 
 const rows: ButtonProps[][] = [
   [
-    { label: 'C', type: 'functional' },
-    { label: '+/-', type: 'functional' },
-    { label: '⌫', type: 'functional' },
+    { label: 'C',  type: 'functional' },
+    { label: '⌫', width: 2, type: 'functional' },
     { label: '÷', type: 'operation' },
   ],
   [
@@ -69,8 +68,8 @@ export default function Index() {
       setResult('');
       return;
     }
-    
-    else if (/^\d+(?:\.\d*)?(?:[+\-×÷]\d*(?:\.\d*)?)?$/.test(next)) {
+
+    else if (/^\d+(?:\.\d*)?(?:[+\-×÷](?:\d+(?:\.\d*)?)?)?$/.test(next)) {
       setInput('');
       setResult(next);
     }
@@ -81,7 +80,7 @@ export default function Index() {
 
     try {
       const [first, operator, second] = result.split(/([+\-×÷])/);
-      if (!operator || !second) return setResult(first);
+      if (!operator || !second) return;
 
       setInput(result);
 
