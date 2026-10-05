@@ -1,18 +1,18 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native'
 
-import { Colors } from '@/constants/colors';
-import { useThemeColors } from '@/hooks/useThemeColors';
+import { Colors } from '@/constants/colors'
+import { useThemeColors } from '@/hooks/useThemeColors'
 
 export type ButtonProps = {
-  label: string;
-  width?: number;
-  type?: 'number' | 'functional' | 'operation';
-  onPress?: () => void;
-};
+  label: string
+  width?: number
+  type?: 'number' | 'functional' | 'operation'
+  onPress?: () => void
+}
 
 export function CalculatorButton({ label, width = 1, type = 'number', onPress }: ButtonProps) {
-  const colors = useThemeColors();
-  const styles = getStyles(colors);
+  const colors = useThemeColors()
+  const styles = getStyles(colors)
 
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [
@@ -26,7 +26,7 @@ export function CalculatorButton({ label, width = 1, type = 'number', onPress }:
         {label}
       </Text>
     </Pressable>
-  );
+  )
 }
 
 function getStyles(colors: typeof Colors.light) {

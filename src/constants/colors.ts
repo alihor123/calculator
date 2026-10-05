@@ -36,4 +36,4 @@ export const Colors = {
     operationText: '#FFFFFF',
     operationPressed: '#FFBF66',
   },
-};
+}

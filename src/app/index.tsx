@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 
-import { CalculatorButton, type ButtonProps } from '@/components/CalculatorButton';
-import { Colors } from '@/constants/colors';
-import { formatText, getTokens } from '@/helpers/calculator';
-import { useThemeColors } from '@/hooks/useThemeColors';
+import { CalculatorButton, type ButtonProps } from '@/components/CalculatorButton'
+import { Colors } from '@/constants/colors'
+import { formatNumber, formatText, getTokens } from '@/helpers/calculator'
+import { useThemeColors } from '@/hooks/useThemeColors'
 
 const rows: ButtonProps[][] = [
   [
@@ -36,94 +36,94 @@ const rows: ButtonProps[][] = [
     { label: '.' },
     { label: '=', type: 'operation' },
   ],
-];
+]
 
 export default function Index() {
-  const [input, setInput] = useState('');
-  const [result, setResult] = useState('');
+  const [input, setInput] = useState('')
+  const [result, setResult] = useState('')
 
-  const colors = useThemeColors();
-  const styles = getStyles(colors);
+  const colors = useThemeColors()
+  const styles = getStyles(colors)
 
 
   function handleClick(value: string) {
     const next = result + value
 
     if (value === '=') {
-      calculate();
+      calculate()
     }
 
     else if (value === 'log') {
-      const tokens = getTokens(result);
-      const a = Number(tokens.at(-1));
-      if (isNaN(a)) return;
+      const tokens = getTokens(result)
+      const a = Number(tokens.at(-1))
+      if (isNaN(a)) return
 
       if (a <= 0) {
-        setInput('');
-        setResult('Ошибка: нужно положительное число');
-        return;
+        setInput('')
+        setResult('Ошибка: нужно положительное число')
+        return
       }
 
-      tokens[tokens.length - 1] = String(Math.log(a));
-      setInput('');
-      setResult(tokens.join(''));
+      tokens[tokens.length - 1] = formatNumber(Math.log(a))
+      setInput('')
+      setResult(tokens.join(''))
     }
 
     else if (value === '⌫') {
-      setInput('');
-      setResult(prev => prev.startsWith('Ошибка') ? '' : prev.slice(0, -1));
-      return;
+      setInput('')
+      setResult(prev => prev.startsWith('Ошибка') ? '' : prev.slice(0, -1))
+      return
     }
 
     else if (value === 'C') {
-      setInput('');
-      setResult('');
-      return;
+      setInput('')
+      setResult('')
+      return
     }
 
     else if (next === '-' || /^-?\d+(?:\.\d*)?(?:[+\-×÷]-?(?:\d+(?:\.\d*)?)?)?$/.test(next)) {
-      setInput('');
-      setResult(next);
+      setInput('')
+      setResult(next)
     }
   }
 
   function calculate() {
-    if (input) return;
+    if (input) return
 
     try {
-      const [first, operator, second] = getTokens(result);
-      if (!operator || !second || second === '-') return;
+      const [first, operator, second] = getTokens(result)
+      if (!operator || !second || second === '-') return
 
-      setInput(result);
+      setInput(result)
 
-      const a = parseFloat(first);
-      const b = parseFloat(second);
+      const a = parseFloat(first)
+      const b = parseFloat(second)
 
-      let answer = a;
+      let answer = a
 
       switch (operator) {
         case '+':
-          answer = a + b;
-          break;
+          answer = a + b
+          break
         case '-':
-          answer = a - b;
-          break;
+          answer = a - b
+          break
         case '×':
-          answer = a * b;
-          break;
+          answer = a * b
+          break
         case '÷':
           if (b === 0) {
-            setResult('Ошибка: деление на ноль');
-            return;
+            setResult('Ошибка: деление на ноль')
+            return
           }
-          answer = a / b;
-          break;
+          answer = a / b
+          break
       }
 
 
-      setResult(String(answer));
+      setResult(formatNumber(answer))
     } catch {
-      setResult('Ошибка');
+      setResult('Ошибка')
     }
   }
 
