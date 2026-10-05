@@ -192,7 +192,7 @@ function getTokens(value: string) {
 function formatText(value: string) {
   const formattedText = getTokens(value)
     .map(token => Number(token) < 0 ? `(${token})` : token)
-    .join(' ');
+    .join('');
 
   return formattedText;
 }
